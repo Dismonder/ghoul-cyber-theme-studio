@@ -1,0 +1,58 @@
+name: Release
+
+# Push a tag like v1.1.0 to test the app, build the ready-to-run archive (app +
+# theme engine) and attach it to a DRAFT release. Review it, then publish.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version, e.g. v1.1.0"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VERSION: ${{ github.event.inputs.version || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb fonts-dejavu-core
+          python -m pip install --upgrade pip
+          python -m pip install pillow pytest
+
+      - name: Tests
+        env:
+          FUZZ_ROUNDS: "10"
+        run: xvfb-run -a python -m pytest -q tests
+
+      - name: Build release archive
+        run: python tools/make_release.py --version "$VERSION"
+
+      - name: Create or update the draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes="docs/release-notes/${VERSION}.md"
+          if ! gh release view "$VERSION" >/dev/null 2>&1; then
+            if [ -f "$notes" ]; then notes_arg=(--notes-file "$notes"); else notes_arg=(--generate-notes); fi
+            gh release create "$VERSION" --draft --target "$GITHUB_SHA" \
+              --title "Theme Studio $VERSION" "${notes_arg[@]}"
+          fi
+          gh release upload "$VERSION" release/"$VERSION"/* --clobber
+          echo "Draft ready: $(gh release view "$VERSION" --json url -q .url)" >> "$GITHUB_STEP_SUMMARY"

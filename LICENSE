@@ -1,0 +1,122 @@
+GHOUL CYBER PROTECTIVE LICENSE (GCPL-1.0)
+=========================================
+Copyright (c) 2026 Dismonder. Wszystkie prawa zastrzeżone / All Rights Reserved.
+Autor / Author: Dismonder
+
+Niniejsza licencja reguluje zasady korzystania, modyfikacji oraz rozpowszechniania
+oprogramowania "Ghoul Cyber rEFInd Theme", w tym skryptów budujących, instalatora,
+plików konfiguracyjnych, dokumentacji oraz towarzyszących zasobów graficznych
+(zwanych dalej łącznie "Oprogramowaniem").
+
+This license governs the use, modification, and distribution of the "Ghoul Cyber
+rEFInd Theme" software, including build scripts, installer, configuration files,
+documentation, and associated graphical assets (collectively referred to as the
+"Software").
+
+--------------------------------------------------------------------------------
+1. PRAWO DO UŻYTKOWANIA (PERMISSION TO USE)
+--------------------------------------------------------------------------------
+PL:
+Udziela się bezpłatnego, niewyłącznego i zbywalnego prawa do prywatnego pobierania,
+instalowania, uruchamiania i używania Oprogramowania na dowolnej liczbie własnych
+komputerów i urządzeń. Dozwolone jest korzystanie z Oprogramowania do celów osobistych,
+edukacyjnych i deweloperskich.
+
+EN:
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+the Software, to download, install, run, and use the Software on any number of
+personal computers or devices for personal, educational, and development purposes.
+
+--------------------------------------------------------------------------------
+2. BEZWZGLĘDNA OCHRONA AUTORSTWA I ZAKAZ ROZPOWSZECHNIANIA POD WŁASNYMI INICJAŁAMI
+   (STRICT ANTI-PLAGIARISM & FALSE ATTRIBUTION CLAUSE)
+--------------------------------------------------------------------------------
+PL:
+a) ZAKAZ PRZYWŁASZCZANIA AUTORSTWA:
+   Bezwzględnie ZABRANIA SIĘ usuwania, ukrywania, zacierania lub modyfikowania
+   podpisu, pseudonimu ("Dismonder"), inicjałów autora, not prawno-autorskich
+   (Copyright), identyfikatorów licencji oraz wszelkich metadanych potwierdzających
+   autorstwo Dismondera w plikach źródłowych, konfiguracjach i dokumentacji.
+
+b) ZAKAZ ROZPOWSZECHNIANIA POD WŁASNYMI INICJAŁAMI / MARKĄ:
+   Bezwzględnie ZABRANIA SIĘ publikowania, re-uploadowania, sublicencjonowania
+   lub rozpowszechniania Oprogramowania (w postaci pierwotnej lub zmienionej) pod
+   własnymi inicjałami, własnym nazwiskiem, własnym pseudonimem, własnym logo,
+   marką handlową lub jako własnego projektu.
+
+c) WARUNEK KAŻDEJ REDYSTRYBUCJI:
+   Jakiekolwiek dozwolone udostępnienie lub redystrybucja Oprogramowania osobom
+   trzecim wymaga:
+   (i)  Pozostawienia nienaruszonego podpisu i autorstwa Dismondera;
+   (ii) Dołączenia pełnego, oryginalnego tekstu niniejszej licencji;
+   (iii) Wyraźnego i widocznego wskazania Dismondera jako wyłącznego pierwotnego
+         autora projektu.
+
+EN:
+a) PROHIBITION OF PLAGIARISM / CONCEALMENT:
+   You may NOT delete, obscure, alter, or replace the signature, name/pseudonym
+   ("Dismonder"), author initials, copyright notices, license tags, or authorship
+   metadata present in the Software, source code, configurations, or documentation.
+
+b) PROHIBITION OF DISTRIBUTION UNDER OWN INITIALS / BRANDING:
+   You are STRICTLY FORBIDDEN from publishing, re-uploading, mirroring,
+   redistributing, or releasing the Software (in whole or in part, modified or
+   unmodified) under your own initials, your own name, your own pseudonym, or
+   your own branding, or in any manner implying that you are the author/creator.
+
+c) MANDATORY ATTRIBUTION:
+   Any permitted sharing or distribution of the Software must:
+   (i)   Preserve all notices crediting Dismonder;
+   (ii)  Include this complete, unaltered License document;
+   (iii) Conspicuously identify Dismonder as the sole original creator.
+
+--------------------------------------------------------------------------------
+3. ZAKAZ UŻYTKU KOMERCYJNEGO (NON-COMMERCIAL RESTRICTION)
+--------------------------------------------------------------------------------
+PL:
+Zabrania się sprzedaży, odpłatnego udostępniania, pobierania opłat za pobranie
+lub włączania Oprogramowania do jakichkolwiek płatnych produktów, dystrybucji
+komercyjnych bądź usług bez uprzedniej, wyraźnej, pisemnej zgody autora (Dismonder).
+
+EN:
+The Software may NOT be sold, rented, leased, licensed for a fee, monetized, or
+bundled into commercial or paid products/services without prior explicit written
+permission from the author (Dismonder).
+
+--------------------------------------------------------------------------------
+4. MODYFIKACJE (DERIVATIVE WORKS & MODIFICATIONS)
+--------------------------------------------------------------------------------
+PL:
+Dozwolone jest modyfikowanie kodu i konfiguracji Oprogramowania na własny, prywatny
+użytek (np. dopasowanie rozdzielczości, ikon systemowych, parametrów EFI lub sprzętowych).
+W przypadku publicznego udostępnienia utworów zależnych, muszą one zachować pełną
+notę o autorstwie Dismondera jako twórcy bazy projektu, podlegać niniejszej licencji
+i nie mogą być rozpowszechniane pod cudzymi inicjałami jako samodzielny, obcy projekt.
+
+EN:
+Modifications for private, local use are permitted. Any publicly distributed fork
+or derivative work must retain full attribution to Dismonder as the original author,
+remain subject to this license, and may not be rebranded or presented under another
+person's initials or name as an original work.
+
+--------------------------------------------------------------------------------
+5. WYŁĄCZENIE GWARANCJI I OGRANICZENIE ODPOWIEDZIALNOŚCI (DISCLAIMER OF WARRANTY)
+--------------------------------------------------------------------------------
+PL:
+OPROGRAMOWANIE JEST DOSTARCZANE W STANIE „TAK JAK JEST” (AS IS), BEZ JAKICHKOLWIEK
+GWARANCJI, WYRAŹNYCH LUB DOROZUMIANYCH. ZE WZGLĘDU NA TO, ŻE OPROGRAMOWANIE DOKONUJE
+OPERACJI NA PARTYCJI SYSTEMOWEJ EFI (ESP), PLIKACH ROZRUCHOWYCH ORAZ ZMIENNYCH
+UEFI/NVRAM, UŻYTKOWNIK KORZYSTA Z NIEGO WYŁĄCZNIE NA WŁASNĄ ODPOWIEDZIALNOŚĆ.
+W ŻADNYM WYPADKU AUTOR (DISMONDER) NIE PONOSI ODPOWIEDZIALNOŚCI ZA JAKIEKOLWIEK
+SZKODY, USZKODZENIE SPRZĘTU, UTRATĘ DANYCH, BŁĘDY ROZRUCHU SYSTEMU ANI ZA ŻADNE
+INNE ROSZCZENIA WYNIKAJĄCE Z KORZYSTANIA Z OPROGRAMOWANIA.
+
+EN:
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. BECAUSE THIS SOFTWARE MODIFIES
+EFI SYSTEM PARTITIONS (ESP), BOOTLOADER ASSETS, AND UEFI NVRAM SETTINGS, ALL
+USAGE IS CARRIED OUT AT YOUR OWN RISK. IN NO EVENT SHALL THE AUTHOR (DISMONDER)
+BE LIABLE FOR ANY CLAIM, DAMAGES, LOSS OF DATA, BOOT FAILURE, SYSTEM UNSTABILITY,
+OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE.
