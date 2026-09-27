@@ -1,4 +1,4 @@
-# 👁️ Ghoul Cyber — Theme Studio
+# Ghoul Cyber – Theme Studio
 
 **🇬🇧 English** | [🇵🇱 Polski](README.pl.md)
 
