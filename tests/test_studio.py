@@ -22,18 +22,39 @@ TYPED = ["", " ", '"', "\\", "{", "}", "\n", "\x00", "死神核", "🔥", "-5", 
          "3,5", "600", "abc", "12345678901234567890", "a" * 500, "#FF003C", "#GGGGGG"]
 
 
+_ROOT = None
+
+
 def studio_env(test: unittest.TestCase):
+    """One shared Tk root per test run (re-creating Tk is flaky on Windows)."""
+    global _ROOT
     try:
         import tkinter as tk
-        root = tk.Tk()
+        if _ROOT is None:
+            _ROOT = tk.Tk()
+            _ROOT.withdraw()
     except Exception as exc:  # noqa: BLE001 - no display
         test.skipTest(f"no Tk display: {exc}")
-    root.withdraw()
+    reset(_ROOT)
     import theme_studio as ts
     importlib.reload(ts)
     sys.path.insert(0, str(ts.ENGINE))
     import build_and_deploy_theme as builder
-    return tk, root, ts, builder
+    return tk, _ROOT, ts, builder
+
+
+def reset(root) -> None:
+    """Cancel the Studio's pending timers, then remove its widgets."""
+    for job in root.tk.splitlist(root.tk.call("after", "info")):
+        root.after_cancel(job)
+    for child in root.winfo_children():
+        child.destroy()
+    root.update()
+
+
+def tearDownModule():
+    if _ROOT is not None:
+        _ROOT.destroy()
 
 
 class StudioTests(unittest.TestCase):
@@ -52,13 +73,14 @@ class StudioTests(unittest.TestCase):
                 root.report_callback_exception = lambda *exc: errors.append(repr(exc[1]))
                 try:
                     studio = ts.Studio(root, ts.load_themes(), builder)
+                    root.report_callback_exception = lambda *exc: errors.append(repr(exc[1]))
                     for i in range(studio.notebook.index("end")):
                         studio.notebook.select(i)
                         root.update()
                     tabs = [studio.notebook.tab(i, "text") for i in range(studio.notebook.index("end"))]
                     self.assertIn("Install" if lang == "en" else "Instalacja", tabs)
                 finally:
-                    root.destroy()
+                    reset(root)
                 self.assertEqual(errors, [])
         os.environ.pop("GHOUL_LANG", None)
 
@@ -72,6 +94,7 @@ class StudioTests(unittest.TestCase):
             ts.CONFIG_PATH = Path(raw) / "boot-config.json"
             try:
                 studio = ts.Studio(root, ts.load_themes(), builder)
+                root.report_callback_exception = lambda *exc: crashes.append(repr(exc[1]))
                 specs = {spec.key: spec for spec in builder.OPTION_SPECS}
                 for i in range(ROUNDS * 8):
                     key = rng.choice(list(studio.fields))
@@ -94,7 +117,7 @@ class StudioTests(unittest.TestCase):
                             saved = json.loads(ts.CONFIG_PATH.read_text(encoding="utf-8"))
                             self.assertEqual(builder.validate_options(saved)[1], [])
             finally:
-                root.destroy()
+                reset(root)
         self.assertEqual(crashes, [])
 
 
