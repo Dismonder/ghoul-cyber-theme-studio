@@ -120,6 +120,49 @@ class StudioTests(unittest.TestCase):
                 reset(root)
         self.assertEqual(crashes, [])
 
+    def test_windows_one_click_commands(self):
+        import theme_studio as ts
+        sys.path.insert(0, str(ts.ENGINE))
+        import build_and_deploy_theme as builder
+
+        remove = ts.remove_command(dry_run=True)
+        self.assertEqual(remove[-2:], ["--remove-refind", "--dry-run"])
+        self.assertTrue(builder.create_parser(ts.ENGINE).parse_args(remove[3:]).remove_refind)
+        # the Studio recognises the engine's own Secure Boot message
+        builder.windows_firmware_is_uefi = lambda: True
+        builder.windows_secure_boot_enabled = lambda: True
+        with self.assertRaises(builder.ThemeError) as caught:
+            builder.install_refind_windows([Path(".")], dry_run=True)
+        self.assertTrue(ts.needs_secure_boot_off(f"ghoul-cyber: {caught.exception}\n"))
+        self.assertFalse(ts.needs_secure_boot_off("ghoul-cyber: elevated installer exited with 2\n"))
+
+    def test_secure_boot_failure_offers_a_firmware_restart(self):
+        tk, root, ts, builder = studio_env(self)
+        ts.IS_WINDOWS = True
+        with tempfile.TemporaryDirectory() as raw:
+            ts.CONFIG_PATH = Path(raw) / "boot-config.json"
+            try:
+                studio = ts.Studio(root, ts.load_themes(), builder)
+                self.assertIsNotNone(studio.remove_button)
+                offered: list[bool] = []
+                studio._offer_firmware_restart = lambda: offered.append(True)
+                studio.run_kind = "install"
+                studio.process = type("Done", (), {"returncode": 2})()
+                studio.lines.put("ghoul-cyber: Secure Boot is ON ... restart with: shutdown /r /fw /t 0\n")
+                studio.lines.put(None)
+                studio._drain_queues()
+                for _ in range(20):
+                    root.update()
+                    if offered:
+                        break
+                    import time
+                    time.sleep(0.02)
+                self.assertEqual(offered, [True])
+                self.assertEqual(studio.status.cget("text"), studio.t("status.secure_boot"))
+                self.assertEqual(str(studio.remove_button.cget("state")), "normal")
+            finally:
+                reset(root)
+
 
 if __name__ == "__main__":
     unittest.main()

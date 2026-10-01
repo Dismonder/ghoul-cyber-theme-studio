@@ -146,6 +146,7 @@ TEXT: dict[str, dict[str, str]] = {
         "install.stop": "Przerwij",
         "install.hint": "Wybierz motyw, dopasuj ustawienia w zakładkach i kliknij przycisk.",
         "install.answer": "Odpowiedź dla instalatora >",
+        "install.remove": "Usuń rEFInd",
         "settings.reset": "Przywróć domyślne",
         "settings.import": "Importuj…",
         "settings.export": "Eksportuj…",
@@ -205,6 +206,19 @@ TEXT: dict[str, dict[str, str]] = {
         "status.installed": "Gotowe. Motyw zainstalowany w rEFInd - zrestartuj komputer.",
         "status.built": "Gotowe. Motyw zbudowany w {path}.",
         "status.failed": "Błąd (kod {code}) - szczegóły w logu. Poprzednia konfiguracja rEFInd została zachowana.",
+        "status.removing": "Usuwam rEFInd z menu rozruchu i partycji EFI...",
+        "status.removed": "Gotowe. rEFInd usunięty - komputer uruchomi Windowsa bezpośrednio.",
+        "status.secure_boot": "Secure Boot jest włączony - wyłącz go w BIOS-ie i kliknij ponownie ZBUDUJ I ZAINSTALUJ.",
+        "remove.title": "Usuń rEFInd",
+        "remove.question": ("Usunąć rEFInd zainstalowany przez Theme Studio (wpis w menu rozruchu, folder "
+                            "EFI\\refind i motyw)? Windows będzie znów startował bezpośrednio."),
+        "firmware.title": "Secure Boot",
+        "firmware.question": ("rEFInd nie wystartuje przy włączonym Secure Boot. Jeśli komputer używa BitLockera, program już go wstrzymał.\n\n"
+                              "Uruchomić teraz komputer ponownie prosto do ustawień BIOS/UEFI? "
+                              "Zapisz najpierw otwarte pliki.\n\nTam ustaw Secure Boot na Disabled, zapisz "
+                              "(zwykle F10) i po starcie Windowsa kliknij ponownie ZBUDUJ I ZAINSTALUJ."),
+        "firmware.failed": ("Nie udało się uruchomić ponownie do BIOS-u:\n{exc}\n\nWejdź do BIOS-u ręcznie "
+                            "(zwykle F2, F10, Del albo Esc zaraz po włączeniu)."),
         "log.stopped": "\n[przerwano]\n",
         "askpass.title": "Autoryzacja administratora",
         "askpass.prompt": "Hasło sudo:",
@@ -233,6 +247,7 @@ TEXT: dict[str, dict[str, str]] = {
         "install.stop": "Stop",
         "install.hint": "Pick a theme, adjust the settings in the tabs and click the button.",
         "install.answer": "Answer for the installer >",
+        "install.remove": "Remove rEFInd",
         "settings.reset": "Restore defaults",
         "settings.import": "Import…",
         "settings.export": "Export…",
@@ -292,6 +307,19 @@ TEXT: dict[str, dict[str, str]] = {
         "status.installed": "Done. Theme installed in rEFInd - restart your computer.",
         "status.built": "Done. Theme built in {path}.",
         "status.failed": "Error (code {code}) - see the log for details. The previous rEFInd configuration was kept.",
+        "status.removing": "Removing rEFInd from the boot menu and the EFI partition...",
+        "status.removed": "Done. rEFInd removed - the PC starts Windows directly again.",
+        "status.secure_boot": "Secure Boot is on - turn it off in the BIOS and click BUILD AND INSTALL again.",
+        "remove.title": "Remove rEFInd",
+        "remove.question": ("Remove the rEFInd that Theme Studio installed (boot menu entry, the "
+                            "EFI\\refind folder and the theme)? Windows will start directly again."),
+        "firmware.title": "Secure Boot",
+        "firmware.question": ("rEFInd will not start while Secure Boot is on. If this PC uses BitLocker, it has already been paused.\n\n"
+                              "Restart now straight into the BIOS/UEFI settings? Save your open files first.\n\n"
+                              "There set Secure Boot to Disabled, save (usually F10) and once Windows is back "
+                              "click BUILD AND INSTALL again."),
+        "firmware.failed": ("Could not restart into the BIOS:\n{exc}\n\nOpen the BIOS yourself "
+                            "(usually F2, F10, Del or Esc right after power-on)."),
         "log.stopped": "\n[stopped]\n",
         "askpass.title": "Administrator authorization",
         "askpass.prompt": "sudo password:",

@@ -10,7 +10,8 @@ Run:  python3 theme_studio.py
 Settings are auto-saved to boot-config.json (only when valid), so the plain
 command-line installer uses exactly what you see here. On Linux the install
 runs build_and_deploy_theme.py and asks for the sudo password in a small
-window (SUDO_ASKPASS). On Windows it builds the package in dist/ghoul-cyber.
+window (SUDO_ASKPASS). On Windows it asks for UAC and, on a PC with only
+Windows, installs rEFInd itself too; "Remove rEFInd" undoes that.
 """
 
 from __future__ import annotations
@@ -43,6 +44,7 @@ CONFIG_PATH = ENGINE / "boot-config.json"   # the builder reads it from next to 
 DEFAULT_THEME = "ghoul-cyber"
 ASKPASS_FLAG = "--askpass"
 IS_LINUX = platform.system() == "Linux"
+IS_WINDOWS = platform.system() == "Windows"
 
 BG = "#050506"
 PANEL = "#0d0d10"
@@ -114,6 +116,26 @@ def build_command(theme: str, *, install: bool, dry_run: bool, config: Path | No
     if dry_run:
         command.append("--dry-run")
     return command
+
+
+def remove_command(*, dry_run: bool) -> list[str]:
+    """Windows: remove the rEFInd the installer put there (it asks for UAC)."""
+    return [sys.executable, "-u", str(BUILDER), "--remove-refind"] + (["--dry-run"] if dry_run else [])
+
+
+def needs_secure_boot_off(output: str) -> bool:
+    """The engine stopped because Secure Boot would keep rEFInd from starting."""
+    return "Secure Boot is ON" in output and "shutdown /r /fw" in output
+
+
+def restart_to_firmware() -> None:
+    """Restart straight into the BIOS/UEFI settings (Windows asks for UAC)."""
+    script = ("Start-Process -FilePath shutdown -ArgumentList '/r','/fw','/t','0' "
+              "-Verb RunAs -WindowStyle Hidden")
+    result = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
+                            capture_output=True, text=True)
+    if result.returncode != 0:
+        raise OSError((result.stderr or result.stdout).strip() or f"exit {result.returncode}")
 
 
 def write_askpass_wrapper() -> Path:
@@ -205,6 +227,9 @@ class Studio:
         self.process: subprocess.Popen[str] | None = None
         self.stopped = False
         self.with_install = True
+        self.run_kind = "install"
+        self.output: list[str] = []         # installer output of the current run
+        self.remove_button = None           # Windows only
         self._systems = None          # detected systems, for the automatic card order
         self._order_refresh = None
         self.lines: queue.Queue[str | None] = queue.Queue()
@@ -438,6 +463,9 @@ class Studio:
         self.build_button.pack(side="right", padx=(8, 8))
         self.stop_button = self._button(controls, self.t("install.stop"), self.stop)
         self.stop_button.configure(state="disabled")
+        if IS_WINDOWS:
+            self.remove_button = self._button(controls, self.t("install.remove"), self.remove_refind)
+            self.remove_button.pack(side="left")
         self.stop_button.pack(side="right", padx=8)
         self.progress = ttk.Progressbar(tab, mode="indeterminate", style="Accent.Horizontal.TProgressbar")
         self.progress.pack(fill="x", padx=10, pady=(2, 4))
@@ -934,6 +962,22 @@ class Studio:
         self.with_install = with_install
         command = build_command(theme.key, install=with_install, dry_run=self.dry_run.get(),
                                 config=CONFIG_PATH)
+        key = "status.building_install" if with_install else "status.building"
+        self._start(command, self.t(key, name=theme.name), "install" if with_install else "build")
+
+    def remove_refind(self):
+        """Windows: undo the rEFInd this app installed (boot entry, EFI\\refind, theme)."""
+        from tkinter import messagebox
+
+        if self.process is not None:
+            return
+        if not messagebox.askyesno(self.t("remove.title"), self.t("remove.question"), parent=self.root):
+            return
+        self._start(remove_command(dry_run=self.dry_run.get()), self.t("status.removing"), "remove")
+
+    def _start(self, command: list[str], status: str, kind: str):
+        self.run_kind = kind
+        self.output = []
         env = dict(os.environ, PYTHONIOENCODING="utf-8")
         if self.askpass is not None:
             env["SUDO_ASKPASS"] = str(self.askpass)
@@ -953,10 +997,11 @@ class Studio:
         self.stopped = False
         self.action.configure(state="disabled")
         self.build_button.configure(state="disabled")
+        if self.remove_button is not None:
+            self.remove_button.configure(state="disabled")
         self.stop_button.configure(state="normal")
         self.progress.start(12)
-        key = "status.building_install" if with_install else "status.building"
-        self.status.configure(text=self.t(key, name=theme.name), fg=TEXT)
+        self.status.configure(text=status, fg=TEXT)
         threading.Thread(target=self._reader, args=(self.process,), daemon=True).start()
 
     def _reader(self, process: subprocess.Popen[str]):
@@ -977,14 +1022,20 @@ class Studio:
                     elif code == 0:
                         if self.dry_run.get():
                             message = self.t("status.dry_run_done")
+                        elif self.run_kind == "remove":
+                            message = self.t("status.removed")
                         elif self.with_install:
                             message = self.t("status.installed")
                         else:
                             message = self.t("status.built", path=ENGINE / "dist" / DEFAULT_THEME)
                         self._finish(message, ok=True)
+                    elif needs_secure_boot_off("".join(self.output)):
+                        self._finish(self.t("status.secure_boot"), ok=False)
+                        self.root.after(50, self._offer_firmware_restart)
                     else:
                         self._finish(self.t("status.failed", code=code), ok=False)
                 else:
+                    self.output.append(line)
                     self._append(line)
         except queue.Empty:
             pass
@@ -1010,8 +1061,21 @@ class Studio:
         state = "normal" if not self.errors else "disabled"
         self.action.configure(state=state)
         self.build_button.configure(state=state)
+        if self.remove_button is not None:
+            self.remove_button.configure(state="normal")
         self.stop_button.configure(state="disabled")
         self.status.configure(text=message, fg=OK if ok else BAD)
+
+    def _offer_firmware_restart(self):
+        """Secure Boot blocks rEFInd: offer to restart straight into the BIOS/UEFI settings."""
+        from tkinter import messagebox
+
+        if not messagebox.askyesno(self.t("firmware.title"), self.t("firmware.question"), parent=self.root):
+            return
+        try:
+            restart_to_firmware()
+        except OSError as exc:
+            messagebox.showerror(self.t("firmware.title"), self.t("firmware.failed", exc=exc), parent=self.root)
 
     def send_answer(self, _event=None):
         text = self.answer.get()
